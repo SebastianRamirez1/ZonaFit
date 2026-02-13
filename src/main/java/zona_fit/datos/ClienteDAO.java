@@ -74,7 +74,32 @@ public class ClienteDAO implements IClienteDAO{
 
     @Override
     public boolean agregarCliene(Cliente cliente) {
-        return false;
+        var agregado = false;
+        PreparedStatement ps;
+        Connection con = Conexion.getConnection();
+        var sql = "INSERT INTO cliente VALUES (?, ?, ?, ?)";
+        try{
+            ps = con.prepareStatement(sql);
+            ps.setString(2, cliente.getNombre());
+            ps.setString(3, cliente.getApellido());
+            ps.setInt(4, cliente.getMembresia());
+            var filas_afectadas = ps.executeUpdate();
+
+            if(filas_afectadas>0){
+                agregado = true;
+            }else{
+                agregado = false;
+            }
+        }catch(Exception e){
+            System.out.println("Error al agregar cliente: " + e.getMessage());
+        }finally{
+            try{
+                con.close();
+            }catch(Exception e){
+                System.out.println("Error al cerrar conexion: " + e.getMessage());
+            }
+        }
+        return agregado;
     }
 
     @Override
@@ -89,6 +114,8 @@ public class ClienteDAO implements IClienteDAO{
 
     public static void main(String[] args) {
         //Listar clientes
+        IClienteDAO clienteDAO = new ClienteDAO();
+        List<Cliente> clientes = clienteDAO.listarClientes();
 
     }
 }
